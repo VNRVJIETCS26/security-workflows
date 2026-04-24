@@ -2,6 +2,12 @@ provider "aws" {
   region = "us-east-1"
 }
 
+resource "aws_kms_key" "main" {
+  description             = "CMK for S3, EC2 and RDS encryption"
+  deletion_window_in_days = 30
+  enable_key_rotation     = true
+}
+
 resource "aws_s3_bucket" "secure_bucket" {
   bucket = "test-secure-private-bucket-12345"
 }
@@ -28,7 +34,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_encryption
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      kms_master_key_id = aws_kms_key.main.arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -46,22 +53,19 @@ resource "aws_security_group" "restricted_sg" {
   description = "Restricted inbound and outbound traffic"
 
   ingress {
-    description = "SSH only from trusted corporate IP"
+    description = "SSH only from trusted dummy IP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-
-    # Replace with your VPN/corporate public IP range
     cidr_blocks = ["203.0.113.10/32"]
   }
 
   egress {
-    description = "HTTPS outbound only"
+    description = "HTTPS only to trusted dummy IP"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["203.0.113.20/32"]
   }
 }
 
@@ -76,23 +80,29 @@ resource "aws_instance" "secure_ec2" {
   }
 
   root_block_device {
-    encrypted = true
+    encrypted  = true
+    kms_key_id = aws_kms_key.main.arn
   }
 }
 
 resource "aws_db_instance" "secure_rds" {
-  identifier          = "secure-rds"
-  engine              = "postgres"
-  instance_class      = "db.t3.micro"
-  allocated_storage   = 20
-  username            = "admin"
-  password            = var.rds_password
-  skip_final_snapshot = false
-  publicly_accessible = false
-  storage_encrypted   = true
+  identifier     = "secure-rds"
+  engine         = "postgres"
+  instance_class = "db.t3.micro"
+
+  allocated_storage = 20
+  username          = "admin"
+  password          = var.rds_password
+
+  publicly_accessible       = false
+  storage_encrypted         = true
+  kms_key_id                = aws_kms_key.main.arn
+  iam_database_authentication_enabled = true
 
   backup_retention_period = 7
   deletion_protection     = true
+  skip_final_snapshot     = false
+  final_snapshot_identifier = "secure-rds-final-snapshot"
 }
 
 variable "rds_password" {
