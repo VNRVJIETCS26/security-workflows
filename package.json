@@ -1,23 +1,24 @@
 {
-  "name": "vulnerable-node-app",
+  "name": "secure-node-app",
   "version": "1.0.0",
-  "description": "Test app with vulnerable dependencies for SCA scanning",
+  "description": "Test app with updated dependencies for SCA scanning",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "audit": "npm audit"
   },
   "dependencies": {
-    "express": "4.16.0",
-    "lodash": "4.17.11",
-    "axios": "0.21.0",
-    "jsonwebtoken": "8.5.1",
-    "mongoose": "5.7.0",
-    "minimist": "0.0.8",
-    "serialize-javascript": "2.1.1"
+    "express": "^4.21.2",
+    "lodash": "^4.17.21",
+    "axios": "^1.7.9",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "minimist": "^1.2.8",
+    "serialize-javascript": "^6.0.2"
   },
   "devDependencies": {
-    "webpack": "4.44.0",
-    "handlebars": "4.0.11",
-    "mocha": "6.0.0"
+    "webpack": "^5.97.1",
+    "handlebars": "^4.7.8",
+    "mocha": "^11.0.1"
   }
 }
