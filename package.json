@@ -14,7 +14,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "minimist": "^1.2.8",
-    "serialize-javascript": "7.0.3"
+    "serialize-javascript": "7.0.5"
   },
   "devDependencies": {
     "webpack": "^5.97.1",
