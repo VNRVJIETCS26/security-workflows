@@ -1,4 +1,4 @@
-name: CodeQL Scan
+name: Security Code Scan
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   analyze:
-    name: CodeQL Analysis
+    name: Security Code Scan
     runs-on: ubuntu-24.04
 
     permissions:
